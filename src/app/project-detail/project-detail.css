@@ -56,16 +56,55 @@ button {
 }
 
 .column {
-  background: #e2e8f0;
   border-radius: 12px;
   padding: 0.75rem;
   min-height: 12rem;
   border: 2px dashed transparent;
 }
 
-.column.over {
-  border-color: #0f172a;
+.column[data-step='open'] {
+  background: #e2e8f0;
+}
+
+.column[data-step='todo'] {
+  background: #dbeafe;
+}
+
+.column[data-step='in-progress'] {
+  background: #ffedd5;
+}
+
+.column[data-step='review'] {
+  background: #ede9fe;
+}
+
+.column[data-step='done'] {
+  background: #dcfce7;
+}
+
+.column[data-step='open'].over {
+  border-color: #475569;
   background: #cbd5e1;
+}
+
+.column[data-step='todo'].over {
+  border-color: #1d4ed8;
+  background: #bfdbfe;
+}
+
+.column[data-step='in-progress'].over {
+  border-color: #c2410c;
+  background: #fed7aa;
+}
+
+.column[data-step='review'].over {
+  border-color: #6d28d9;
+  background: #ddd6fe;
+}
+
+.column[data-step='done'].over {
+  border-color: #15803d;
+  background: #bbf7d0;
 }
 
 h2 {
@@ -73,6 +112,26 @@ h2 {
   font-size: 0.85rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.column[data-step='open'] h2 {
+  color: #334155;
+}
+
+.column[data-step='todo'] h2 {
+  color: #1d4ed8;
+}
+
+.column[data-step='in-progress'] h2 {
+  color: #c2410c;
+}
+
+.column[data-step='review'] h2 {
+  color: #6d28d9;
+}
+
+.column[data-step='done'] h2 {
+  color: #15803d;
 }
 
 .empty {
@@ -87,6 +146,23 @@ article {
   padding: 0.7rem;
   margin-bottom: 0.5rem;
   cursor: grab;
+  border-left: 4px solid #94a3b8;
+}
+
+.column[data-step='todo'] article {
+  border-left-color: #2563eb;
+}
+
+.column[data-step='in-progress'] article {
+  border-left-color: #ea580c;
+}
+
+.column[data-step='review'] article {
+  border-left-color: #7c3aed;
+}
+
+.column[data-step='done'] article {
+  border-left-color: #16a34a;
 }
 
 article.dragging {

@@ -14,6 +14,7 @@
       @for (step of steps; track step.id) {
         <section
           class="column"
+          [attr.data-step]="step.id"
           [class.over]="overStatus === step.id"
           (dragover)="dragOver($event, step.id)"
           (dragleave)="dragLeave()"
