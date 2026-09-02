@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -8,6 +9,8 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './login.css',
 })
 export class Login {
+  private readonly router = inject(Router);
+
   name = '';
   message = signal('');
 
@@ -19,6 +22,6 @@ export class Login {
     }
 
     sessionStorage.setItem('flowboard-user', user);
-    this.message.set(`Logged in as ${user}. Next we’ll build the dashboard.`);
+    this.router.navigateByUrl('/dashboard');
   }
 }
