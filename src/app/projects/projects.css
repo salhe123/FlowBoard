@@ -14,6 +14,63 @@ h1 {
   margin: 0.5rem 0 1.25rem;
 }
 
+form {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+input {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font: inherit;
+}
+
+button {
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.danger {
+  background: #b91c1c;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.65rem;
+  flex-shrink: 0;
+}
+
+.ghost {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.actions button {
+  font-size: 0.8rem;
+  padding: 0.4rem 0.65rem;
+}
+
+.edit {
+  flex: 1;
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.empty {
+  color: #64748b;
+}
+
 ul {
   list-style: none;
   margin: 0;
@@ -23,6 +80,9 @@ ul {
 }
 
 li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -30,6 +90,8 @@ li {
 }
 
 li a {
+  flex: 1;
+  min-width: 0;
   display: block;
   color: inherit;
   text-decoration: none;

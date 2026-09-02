@@ -2,8 +2,29 @@
   <a class="back" routerLink="/projects">← Projects</a>
 
   @if (project) {
-    <h1>{{ project.name }}</h1>
-    <p class="lead">{{ project.description }}</p>
+    @if (editingProject) {
+      <form class="project-edit" (submit)="saveProject(); $event.preventDefault()">
+        <input [(ngModel)]="projectName" name="projectName" type="text" placeholder="Project name" />
+        <input
+          [(ngModel)]="projectDescription"
+          name="projectDescription"
+          type="text"
+          placeholder="Short description"
+        />
+        <div class="actions">
+          <button type="submit">Save</button>
+          <button type="button" class="ghost" (click)="cancelProject()">Cancel</button>
+        </div>
+      </form>
+    } @else {
+      <div class="heading">
+        <div>
+          <h1>{{ project.name }}</h1>
+          <p class="lead">{{ project.description || 'No description' }}</p>
+        </div>
+        <button type="button" (click)="startEditProject()">Edit</button>
+      </div>
+    }
 
     <div class="toolbar">
       <form (submit)="add(); $event.preventDefault()">

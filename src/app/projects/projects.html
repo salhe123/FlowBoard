@@ -2,14 +2,44 @@
   <a class="back" routerLink="/dashboard">← Dashboard</a>
   <h1>Projects</h1>
 
-  <ul>
-    @for (project of projects; track project.id) {
-      <li>
-        <a [routerLink]="['/projects', project.id]">
-          <h2>{{ project.name }}</h2>
-          <p>{{ project.description }}</p>
-        </a>
-      </li>
-    }
-  </ul>
+  <form (submit)="add(); $event.preventDefault()">
+    <input [(ngModel)]="name" name="name" type="text" placeholder="Project name" />
+    <input [(ngModel)]="description" name="description" type="text" placeholder="Short description" />
+    <button type="submit">Add</button>
+  </form>
+
+  @if (projects.length === 0) {
+    <p class="empty">No projects yet. Add one above.</p>
+  } @else {
+    <ul>
+      @for (project of projects; track project.id) {
+        <li>
+          @if (editingId === project.id) {
+            <form class="edit" (submit)="saveEdit(); $event.preventDefault()">
+              <input [(ngModel)]="editName" name="editName" type="text" placeholder="Project name" />
+              <input
+                [(ngModel)]="editDescription"
+                name="editDescription"
+                type="text"
+                placeholder="Short description"
+              />
+              <div class="actions">
+                <button type="submit">Save</button>
+                <button type="button" class="ghost" (click)="cancelEdit()">Cancel</button>
+              </div>
+            </form>
+          } @else {
+            <a [routerLink]="['/projects', project.id]">
+              <h2>{{ project.name }}</h2>
+              <p>{{ project.description || 'No description' }}</p>
+            </a>
+            <div class="actions">
+              <button type="button" (click)="startEdit(project)">Edit</button>
+              <button type="button" class="danger" (click)="remove(project)">Delete</button>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
 </section>

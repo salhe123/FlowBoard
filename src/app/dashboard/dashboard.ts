@@ -12,5 +12,8 @@ export class Dashboard {
   private readonly board = inject(BoardService);
 
   name = this.board.userName;
-  counts = this.board.counts();
+
+  get counts() {
+    return this.board.counts();
+  }
 }

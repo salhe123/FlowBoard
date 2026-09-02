@@ -23,6 +23,9 @@ export class ProjectDetail {
   overStatus: TaskStatus | '' = '';
   editingId = '';
   editTitle = '';
+  editingProject = false;
+  projectName = '';
+  projectDescription = '';
 
   constructor() {
     const id = this.route.snapshot.paramMap.get('id') ?? '';
@@ -37,6 +40,28 @@ export class ProjectDetail {
     this.board.addTask(this.project.id, this.title);
     this.title = '';
     this.reload();
+  }
+
+  startEditProject() {
+    if (!this.project) {
+      return;
+    }
+    this.editingProject = true;
+    this.projectName = this.project.name;
+    this.projectDescription = this.project.description;
+  }
+
+  saveProject() {
+    if (!this.project) {
+      return;
+    }
+    this.board.updateProject(this.project.id, this.projectName, this.projectDescription);
+    this.editingProject = false;
+    this.project = this.board.projectById(this.project.id);
+  }
+
+  cancelProject() {
+    this.editingProject = false;
   }
 
   startEdit(task: Task) {
