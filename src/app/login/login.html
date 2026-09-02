@@ -1,15 +1,55 @@
-<section class="card">
-  <h1>FlowBoard</h1>
-  <p class="hint">Dummy login — any name works. No password, no API.</p>
+<div class="screen">
+  <section class="hero">
+    <p class="mark">FB</p>
+    <h1>FlowBoard</h1>
+    <p class="tag">Plan projects, move tasks across the board, and keep work in one place.</p>
+    <ul>
+      <li>Projects and task boards</li>
+      <li>Drag cards between steps</li>
+      <li>Saved in this browser</li>
+    </ul>
+  </section>
 
-  <label>
-    Your name
-    <input [(ngModel)]="name" name="name" type="text" placeholder="e.g. Salhe" />
-  </label>
+  <section class="panel">
+    <form
+      class="card"
+      [class.dragging]="dragging"
+      [style.translate]="x + 'px ' + y + 'px'"
+      (pointerdown)="pointerDown($event)"
+      (pointermove)="pointerMove($event)"
+      (pointerup)="pointerUp($event)"
+      (pointercancel)="pointerUp($event)"
+      (submit)="submit(); $event.preventDefault()"
+    >
+      <div class="grip">
+        <span></span>
+        Drag to move
+      </div>
 
-  <button type="button" (click)="submit()">Enter</button>
+      <h2>Sign in</h2>
+      <p class="hint">Welcome back. Use your name to open the board.</p>
 
-  @if (message()) {
-    <p class="status">{{ message() }}</p>
-  }
-</section>
+      <label>
+        Name
+        <input [(ngModel)]="name" name="name" type="text" autocomplete="username" placeholder="Your name" />
+      </label>
+
+      <label>
+        Password
+        <input
+          [(ngModel)]="password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Enter password"
+        />
+      </label>
+
+      <button type="submit">Continue</button>
+
+      @if (message()) {
+        <p class="status">{{ message() }}</p>
+      }
+    </form>
+  </section>
+</div>
