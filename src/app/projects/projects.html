@@ -5,8 +5,10 @@
   <ul>
     @for (project of projects; track project.id) {
       <li>
-        <h2>{{ project.name }}</h2>
-        <p>{{ project.description }}</p>
+        <a [routerLink]="['/projects', project.id]">
+          <h2>{{ project.name }}</h2>
+          <p>{{ project.description }}</p>
+        </a>
       </li>
     }
   </ul>

@@ -1,0 +1,30 @@
+<section class="page">
+  <a class="back" routerLink="/projects">← Projects</a>
+
+  @if (project) {
+    <h1>{{ project.name }}</h1>
+    <p class="lead">{{ project.description }}</p>
+
+    <form (submit)="add(); $event.preventDefault()">
+      <input [(ngModel)]="title" name="title" type="text" placeholder="New task" />
+      <button type="submit">Add</button>
+    </form>
+
+    @if (tasks.length === 0) {
+      <p class="empty">No tasks yet.</p>
+    }
+
+    <ul>
+      @for (task of tasks; track task.id) {
+        <li>
+          <span class="status">{{ task.status }}</span>
+          <span class="title">{{ task.title }}</span>
+          <button type="button" (click)="cycle(task.id)">Next status</button>
+          <button type="button" class="danger" (click)="remove(task.id)">Delete</button>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p>Project not found.</p>
+  }
+</section>

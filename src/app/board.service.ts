@@ -31,8 +31,43 @@ export class BoardService {
     return this.tasks;
   }
 
+  projectById(id: string): Project | undefined {
+    return this.projects.find((project) => project.id === id);
+  }
+
   tasksFor(projectId: string): Task[] {
     return this.tasks.filter((task) => task.projectId === projectId);
+  }
+
+  addTask(projectId: string, title: string) {
+    const trimmed = title.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    this.tasks.push({
+      id: `t${Date.now()}`,
+      projectId,
+      title: trimmed,
+      status: 'todo',
+    });
+  }
+
+  cycleStatus(taskId: string) {
+    const task = this.tasks.find((item) => item.id === taskId);
+    if (!task) {
+      return;
+    }
+
+    const next = { todo: 'doing', doing: 'done', done: 'todo' } as const;
+    task.status = next[task.status];
+  }
+
+  deleteTask(taskId: string) {
+    const index = this.tasks.findIndex((item) => item.id === taskId);
+    if (index >= 0) {
+      this.tasks.splice(index, 1);
+    }
   }
 
   counts() {
