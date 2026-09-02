@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Project, Task } from './models';
+import { Project, Task, TASK_STEPS, TaskStatus } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class BoardService {
@@ -11,11 +11,11 @@ export class BoardService {
 
   private readonly tasks: Task[] = [
     { id: 't1', projectId: 'p1', title: 'Home page layout', status: 'done' },
-    { id: 't2', projectId: 'p1', title: 'Contact form', status: 'doing' },
+    { id: 't2', projectId: 'p1', title: 'Contact form', status: 'in-progress' },
     { id: 't3', projectId: 'p1', title: 'SEO meta tags', status: 'todo' },
-    { id: 't4', projectId: 'p2', title: 'Login screen', status: 'doing' },
-    { id: 't5', projectId: 'p2', title: 'Push notifications', status: 'todo' },
-    { id: 't6', projectId: 'p3', title: 'Auth endpoints', status: 'done' },
+    { id: 't4', projectId: 'p2', title: 'Login screen', status: 'in-progress' },
+    { id: 't5', projectId: 'p2', title: 'Push notifications', status: 'open' },
+    { id: 't6', projectId: 'p3', title: 'Auth endpoints', status: 'review' },
     { id: 't7', projectId: 'p3', title: 'Rate limiting', status: 'todo' },
   ];
 
@@ -49,8 +49,15 @@ export class BoardService {
       id: `t${Date.now()}`,
       projectId,
       title: trimmed,
-      status: 'todo',
+      status: 'open',
     });
+  }
+
+  setStatus(taskId: string, status: TaskStatus) {
+    const task = this.tasks.find((item) => item.id === taskId);
+    if (task) {
+      task.status = status;
+    }
   }
 
   cycleStatus(taskId: string) {
@@ -59,8 +66,9 @@ export class BoardService {
       return;
     }
 
-    const next = { todo: 'doing', doing: 'done', done: 'todo' } as const;
-    task.status = next[task.status];
+    const order = TASK_STEPS.map((step) => step.id);
+    const index = order.indexOf(task.status);
+    task.status = order[(index + 1) % order.length];
   }
 
   deleteTask(taskId: string) {

@@ -6,24 +6,39 @@
     <p class="lead">{{ project.description }}</p>
 
     <form (submit)="add(); $event.preventDefault()">
-      <input [(ngModel)]="title" name="title" type="text" placeholder="New task" />
+      <input [(ngModel)]="title" name="title" type="text" placeholder="New task (starts as Open)" />
       <button type="submit">Add</button>
     </form>
 
-    @if (tasks.length === 0) {
-      <p class="empty">No tasks yet.</p>
-    }
-
-    <ul>
-      @for (task of tasks; track task.id) {
-        <li>
-          <span class="status">{{ task.status }}</span>
-          <span class="title">{{ task.title }}</span>
-          <button type="button" (click)="cycle(task.id)">Next status</button>
-          <button type="button" class="danger" (click)="remove(task.id)">Delete</button>
-        </li>
+    <div class="board">
+      @for (step of steps; track step.id) {
+        <section
+          class="column"
+          [class.over]="overStatus === step.id"
+          (dragover)="dragOver($event, step.id)"
+          (dragleave)="dragLeave()"
+          (drop)="drop(step.id)"
+        >
+          <h2>{{ step.label }}</h2>
+          @if (tasksIn(step.id).length === 0) {
+            <p class="empty">Drop here</p>
+          }
+          @for (task of tasksIn(step.id); track task.id) {
+            <article
+              draggable="true"
+              [class.dragging]="draggingId === task.id"
+              (dragstart)="dragStart(task.id)"
+            >
+              <p>{{ task.title }}</p>
+              <div class="actions">
+                <button type="button" (click)="cycle(task.id)">Next step</button>
+                <button type="button" class="danger" (click)="remove(task.id)">Delete</button>
+              </div>
+            </article>
+          }
+        </section>
       }
-    </ul>
+    </div>
   } @else {
     <p>Project not found.</p>
   }

@@ -1,5 +1,5 @@
 .page {
-  max-width: 40rem;
+  max-width: 72rem;
   margin: 0 auto;
   padding: 2rem 1.25rem;
 }
@@ -14,15 +14,15 @@ h1 {
   margin: 0.5rem 0 0.25rem;
 }
 
-.lead,
-.empty {
+.lead {
   color: #64748b;
 }
 
 form {
   display: flex;
   gap: 0.5rem;
-  margin: 1.25rem 0;
+  margin: 1.25rem 0 1.5rem;
+  max-width: 32rem;
 }
 
 input {
@@ -34,12 +34,13 @@ input {
 }
 
 button {
-  padding: 0.55rem 0.75rem;
+  padding: 0.4rem 0.65rem;
   border: 0;
   border-radius: 8px;
   background: #0f172a;
   color: #fff;
   font: inherit;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 
@@ -47,28 +48,63 @@ button {
   background: #b91c1c;
 }
 
-ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.board {
   display: grid;
-  gap: 0.5rem;
+  grid-template-columns: repeat(5, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  overflow-x: auto;
 }
 
-li {
-  display: grid;
-  grid-template-columns: 4.5rem 1fr auto auto;
-  gap: 0.5rem;
-  align-items: center;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 0.65rem 0.75rem;
+.column {
+  background: #e2e8f0;
+  border-radius: 12px;
+  padding: 0.75rem;
+  min-height: 12rem;
+  border: 2px dashed transparent;
 }
 
-.status {
-  font-size: 0.75rem;
-  font-weight: 700;
+.column.over {
+  border-color: #0f172a;
+  background: #cbd5e1;
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.empty {
+  margin: 0 0 0.5rem;
   color: #64748b;
+  font-size: 0.8rem;
+}
+
+article {
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.7rem;
+  margin-bottom: 0.5rem;
+  cursor: grab;
+}
+
+article.dragging {
+  opacity: 0.55;
+}
+
+article p {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+@media (max-width: 800px) {
+  .board {
+    grid-template-columns: repeat(5, 14rem);
+  }
 }

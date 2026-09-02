@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BoardService } from '../board.service';
-import { Project, Task } from '../models';
+import { Project, Task, TASK_STEPS, TaskStatus } from '../models';
 
 @Component({
   selector: 'app-project-detail',
@@ -17,6 +17,9 @@ export class ProjectDetail {
   project: Project | undefined;
   tasks: Task[] = [];
   title = '';
+  steps = TASK_STEPS;
+  draggingId = '';
+  overStatus: TaskStatus | '' = '';
 
   constructor() {
     const id = this.route.snapshot.paramMap.get('id') ?? '';
@@ -41,6 +44,32 @@ export class ProjectDetail {
   remove(taskId: string) {
     this.board.deleteTask(taskId);
     this.reload();
+  }
+
+  tasksIn(status: TaskStatus): Task[] {
+    return this.tasks.filter((task) => task.status === status);
+  }
+
+  dragStart(taskId: string) {
+    this.draggingId = taskId;
+  }
+
+  dragOver(event: DragEvent, status: TaskStatus) {
+    event.preventDefault();
+    this.overStatus = status;
+  }
+
+  dragLeave() {
+    this.overStatus = '';
+  }
+
+  drop(status: TaskStatus) {
+    if (this.draggingId) {
+      this.board.setStatus(this.draggingId, status);
+      this.draggingId = '';
+      this.overStatus = '';
+      this.reload();
+    }
   }
 
   private reload() {
