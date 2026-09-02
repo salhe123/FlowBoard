@@ -16,4 +16,11 @@ export class Dashboard {
   get counts() {
     return this.board.counts();
   }
+
+  reset() {
+    if (!confirm('Reset to the original demo projects and tasks?')) {
+      return;
+    }
+    this.board.resetDemo();
+  }
 }

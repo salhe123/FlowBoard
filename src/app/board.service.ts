@@ -153,6 +153,25 @@ export class BoardService {
     };
   }
 
+  countsFor(projectId: string) {
+    const tasks = this.tasksFor(projectId);
+    return {
+      total: tasks.length,
+      done: tasks.filter((task) => task.status === 'done').length,
+      steps: TASK_STEPS.map((step) => ({
+        ...step,
+        count: tasks.filter((task) => task.status === step.id).length,
+      })),
+    };
+  }
+
+  resetDemo() {
+    const seeded = this.seed();
+    this.projects = seeded.projects;
+    this.tasks = seeded.tasks;
+    this.save();
+  }
+
   private read(): { projects: Project[]; tasks: Task[] } {
     try {
       const raw = localStorage.getItem(DATA_KEY);

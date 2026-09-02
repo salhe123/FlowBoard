@@ -87,3 +87,16 @@ a {
   color: #0f172a;
   font-weight: 600;
 }
+
+.reset {
+  display: block;
+  margin-top: 1rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #64748b;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}

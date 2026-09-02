@@ -8,11 +8,22 @@
     <button type="submit">Add</button>
   </form>
 
+  <input
+    class="search"
+    [(ngModel)]="query"
+    [ngModelOptions]="{ standalone: true }"
+    name="query"
+    type="search"
+    placeholder="Search projects"
+  />
+
   @if (projects.length === 0) {
     <p class="empty">No projects yet. Add one above.</p>
+  } @else if (visible().length === 0) {
+    <p class="empty">No projects match “{{ query }}”.</p>
   } @else {
     <ul>
-      @for (project of projects; track project.id) {
+      @for (project of visible(); track project.id) {
         <li>
           @if (editingId === project.id) {
             <form class="edit" (submit)="saveEdit(); $event.preventDefault()">
@@ -32,6 +43,11 @@
             <a [routerLink]="['/projects', project.id]">
               <h2>{{ project.name }}</h2>
               <p>{{ project.description || 'No description' }}</p>
+              <div class="pills">
+                @for (step of counts(project.id).steps; track step.id) {
+                  <span [attr.data-step]="step.id" [title]="step.label">{{ step.count }}</span>
+                }
+              </div>
             </a>
             <div class="actions">
               <button type="button" (click)="startEdit(project)">Edit</button>

@@ -16,6 +16,7 @@ export class Projects {
   projects: Project[] = [];
   name = '';
   description = '';
+  query = '';
   editingId = '';
   editName = '';
   editDescription = '';
@@ -53,6 +54,20 @@ export class Projects {
     }
     this.board.deleteProject(project.id);
     this.reload();
+  }
+
+  visible(): Project[] {
+    const q = this.query.trim().toLowerCase();
+    return this.projects.filter(
+      (project) =>
+        !q ||
+        project.name.toLowerCase().includes(q) ||
+        project.description.toLowerCase().includes(q),
+    );
+  }
+
+  counts(projectId: string) {
+    return this.board.countsFor(projectId);
   }
 
   private reload() {
