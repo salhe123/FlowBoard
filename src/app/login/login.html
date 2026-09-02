@@ -1,0 +1,15 @@
+<section class="card">
+  <h1>FlowBoard</h1>
+  <p class="hint">Dummy login — any name works. No password, no API.</p>
+
+  <label>
+    Your name
+    <input [(ngModel)]="name" name="name" type="text" placeholder="e.g. Salhe" />
+  </label>
+
+  <button type="button" (click)="submit()">Enter</button>
+
+  @if (message()) {
+    <p class="status">{{ message() }}</p>
+  }
+</section>
