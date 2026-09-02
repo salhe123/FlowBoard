@@ -1,8 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Project, Task, TASK_STEPS, TaskStatus } from './models';
+
+const USER_KEY = 'flowboard-user';
 
 @Injectable({ providedIn: 'root' })
 export class BoardService {
+  readonly userName = signal(sessionStorage.getItem(USER_KEY) ?? '');
   private readonly projects: Project[] = [
     { id: 'p1', name: 'Website', description: 'Marketing site refresh' },
     { id: 'p2', name: 'Mobile app', description: 'iOS / Android client' },
@@ -19,8 +22,14 @@ export class BoardService {
     { id: 't7', projectId: 'p3', title: 'Rate limiting', status: 'todo' },
   ];
 
-  userName(): string {
-    return sessionStorage.getItem('flowboard-user') ?? '';
+  login(name: string) {
+    sessionStorage.setItem(USER_KEY, name);
+    this.userName.set(name);
+  }
+
+  logout() {
+    sessionStorage.removeItem(USER_KEY);
+    this.userName.set('');
   }
 
   allProjects(): Project[] {
@@ -51,6 +60,14 @@ export class BoardService {
       title: trimmed,
       status: 'open',
     });
+  }
+
+  renameTask(taskId: string, title: string) {
+    const trimmed = title.trim();
+    const task = this.tasks.find((item) => item.id === taskId);
+    if (task && trimmed) {
+      task.title = trimmed;
+    }
   }
 
   setStatus(taskId: string, status: TaskStatus) {
@@ -84,6 +101,10 @@ export class BoardService {
       projects: this.projects.length,
       tasks: tasks.length,
       done: tasks.filter((task) => task.status === 'done').length,
+      steps: TASK_STEPS.map((step) => ({
+        ...step,
+        count: tasks.filter((task) => task.status === step.id).length,
+      })),
     };
   }
 }

@@ -1,7 +1,7 @@
 <section class="page">
   <header>
     <p class="eyebrow">Dashboard</p>
-    <h1>Hi, {{ name }}</h1>
+    <h1>Hi, {{ name() }}</h1>
   </header>
 
   <div class="stats">
@@ -17,6 +17,16 @@
       <span>{{ counts.done }}</span>
       <p>Done</p>
     </article>
+  </div>
+
+  <h2>By step</h2>
+  <div class="steps">
+    @for (step of counts.steps; track step.id) {
+      <article [attr.data-step]="step.id">
+        <span>{{ step.count }}</span>
+        <p>{{ step.label }}</p>
+      </article>
+    }
   </div>
 
   <a routerLink="/projects">View projects →</a>

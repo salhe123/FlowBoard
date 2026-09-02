@@ -5,10 +5,20 @@
     <h1>{{ project.name }}</h1>
     <p class="lead">{{ project.description }}</p>
 
-    <form (submit)="add(); $event.preventDefault()">
-      <input [(ngModel)]="title" name="title" type="text" placeholder="New task (starts as Open)" />
-      <button type="submit">Add</button>
-    </form>
+    <div class="toolbar">
+      <form (submit)="add(); $event.preventDefault()">
+        <input [(ngModel)]="title" name="title" type="text" placeholder="New task (starts as Open)" />
+        <button type="submit">Add</button>
+      </form>
+      <input
+        class="search"
+        [(ngModel)]="query"
+        [ngModelOptions]="{ standalone: true }"
+        name="query"
+        type="search"
+        placeholder="Search tasks"
+      />
+    </div>
 
     <div class="board">
       @for (step of steps; track step.id) {
@@ -26,15 +36,24 @@
           }
           @for (task of tasksIn(step.id); track task.id) {
             <article
-              draggable="true"
+              [attr.draggable]="editingId !== task.id"
               [class.dragging]="draggingId === task.id"
               (dragstart)="dragStart(task.id)"
             >
-              <p>{{ task.title }}</p>
-              <div class="actions">
-                <button type="button" (click)="cycle(task.id)">Next step</button>
-                <button type="button" class="danger" (click)="remove(task.id)">Delete</button>
-              </div>
+              @if (editingId === task.id) {
+                <form class="edit" (submit)="saveEdit(); $event.preventDefault()">
+                  <input [(ngModel)]="editTitle" name="editTitle" type="text" />
+                  <button type="submit">Save</button>
+                  <button type="button" class="ghost" (click)="cancelEdit()">Cancel</button>
+                </form>
+              } @else {
+                <p>{{ task.title }}</p>
+                <div class="actions">
+                  <button type="button" (click)="startEdit(task)">Edit</button>
+                  <button type="button" (click)="cycle(task.id)">Next step</button>
+                  <button type="button" class="danger" (click)="remove(task.id)">Delete</button>
+                </div>
+              }
             </article>
           }
         </section>

@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { BoardService } from '../board.service';
 
 @Component({
   selector: 'app-login',
@@ -9,6 +10,7 @@ import { Router } from '@angular/router';
   styleUrl: './login.css',
 })
 export class Login {
+  private readonly board = inject(BoardService);
   private readonly router = inject(Router);
 
   name = '';
@@ -21,7 +23,7 @@ export class Login {
       return;
     }
 
-    sessionStorage.setItem('flowboard-user', user);
+    this.board.login(user);
     this.router.navigateByUrl('/dashboard');
   }
 }

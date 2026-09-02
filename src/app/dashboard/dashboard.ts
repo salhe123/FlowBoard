@@ -11,6 +11,6 @@ import { BoardService } from '../board.service';
 export class Dashboard {
   private readonly board = inject(BoardService);
 
-  name = this.board.userName();
+  name = this.board.userName;
   counts = this.board.counts();
 }

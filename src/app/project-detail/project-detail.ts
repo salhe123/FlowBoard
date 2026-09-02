@@ -17,9 +17,12 @@ export class ProjectDetail {
   project: Project | undefined;
   tasks: Task[] = [];
   title = '';
+  query = '';
   steps = TASK_STEPS;
   draggingId = '';
   overStatus: TaskStatus | '' = '';
+  editingId = '';
+  editTitle = '';
 
   constructor() {
     const id = this.route.snapshot.paramMap.get('id') ?? '';
@@ -36,6 +39,23 @@ export class ProjectDetail {
     this.reload();
   }
 
+  startEdit(task: Task) {
+    this.editingId = task.id;
+    this.editTitle = task.title;
+  }
+
+  saveEdit() {
+    this.board.renameTask(this.editingId, this.editTitle);
+    this.editingId = '';
+    this.editTitle = '';
+    this.reload();
+  }
+
+  cancelEdit() {
+    this.editingId = '';
+    this.editTitle = '';
+  }
+
   cycle(taskId: string) {
     this.board.cycleStatus(taskId);
     this.reload();
@@ -47,10 +67,16 @@ export class ProjectDetail {
   }
 
   tasksIn(status: TaskStatus): Task[] {
-    return this.tasks.filter((task) => task.status === status);
+    const q = this.query.trim().toLowerCase();
+    return this.tasks.filter(
+      (task) => task.status === status && (!q || task.title.toLowerCase().includes(q)),
+    );
   }
 
   dragStart(taskId: string) {
+    if (this.editingId === taskId) {
+      return;
+    }
     this.draggingId = taskId;
   }
 

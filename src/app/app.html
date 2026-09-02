@@ -1,1 +1,13 @@
+@if (board.userName()) {
+  <header class="top">
+    <a class="brand" routerLink="/dashboard">FlowBoard</a>
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/projects" routerLinkActive="active">Projects</a>
+    </nav>
+    <p class="who">{{ board.userName() }}</p>
+    <button type="button" (click)="logout()">Log out</button>
+  </header>
+}
+
 <router-outlet />

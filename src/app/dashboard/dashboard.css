@@ -22,11 +22,51 @@ h1 {
   gap: 0.75rem;
 }
 
+h2 {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+}
+
 article {
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 1rem;
+}
+
+.steps article[data-step='open'] {
+  background: #e2e8f0;
+}
+
+.steps article[data-step='todo'] {
+  background: #dbeafe;
+}
+
+.steps article[data-step='in-progress'] {
+  background: #ffedd5;
+}
+
+.steps article[data-step='review'] {
+  background: #ede9fe;
+}
+
+.steps article[data-step='done'] {
+  background: #dcfce7;
+}
+
+@media (max-width: 700px) {
+  .steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 span {
