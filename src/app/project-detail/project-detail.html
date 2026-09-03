@@ -34,6 +34,12 @@
             <option [value]="level.id">{{ level.label }}</option>
           }
         </select>
+        <select [(ngModel)]="newAssignee" name="newAssignee">
+          <option value="">Unassigned</option>
+          @for (person of people; track person) {
+            <option [value]="person">{{ person }}</option>
+          }
+        </select>
         <button type="submit">Add</button>
       </form>
       <input
@@ -60,6 +66,21 @@
           {{ level.label }}
         </button>
       }
+      <button type="button" [class.on]="onlyOverdue" (click)="onlyOverdue = !onlyOverdue">
+        Overdue
+      </button>
+      <select [(ngModel)]="assigneeFilter" name="assigneeFilter">
+        <option value="all">Everyone</option>
+        <option value="none">Unassigned</option>
+        @for (person of people; track person) {
+          <option [value]="person">{{ person }}</option>
+        }
+      </select>
+      <select [(ngModel)]="sortBy" name="sortBy">
+        <option value="board">Sort: board</option>
+        <option value="priority">Sort: priority</option>
+        <option value="due">Sort: due date</option>
+      </select>
     </div>
 
     <div class="board">
@@ -93,6 +114,12 @@
                     }
                   </select>
                   <input [(ngModel)]="editDue" name="editDue" type="date" />
+                  <select [(ngModel)]="editAssignee" name="editAssignee">
+                    <option value="">Unassigned</option>
+                    @for (person of people; track person) {
+                      <option [value]="person">{{ person }}</option>
+                    }
+                  </select>
                   <textarea
                     [(ngModel)]="editNotes"
                     name="editNotes"
@@ -111,12 +138,16 @@
                   @if (task.due) {
                     <span class="due" [class.late]="overdue(task)">{{ task.due }}</span>
                   }
+                  @if (task.assignee) {
+                    <span class="who">{{ task.assignee }}</span>
+                  }
                 </div>
                 @if (task.notes) {
                   <p class="notes">{{ task.notes }}</p>
                 }
                 <div class="actions">
                   <button type="button" (click)="startEdit(task)">Edit</button>
+                  <button type="button" class="ghost" (click)="copy(task.id)">Copy</button>
                   <button type="button" (click)="cycle(task.id)">Next step</button>
                   <button type="button" class="danger" (click)="remove(task.id)">Delete</button>
                 </div>

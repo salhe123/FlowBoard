@@ -37,6 +37,22 @@
     }
   </div>
 
+  <h2>Overdue</h2>
+  @if (overdue.length === 0) {
+    <p class="empty">Nothing overdue.</p>
+  } @else {
+    <ul class="late-list">
+      @for (task of overdue; track task.id) {
+        <li>
+          <a [routerLink]="['/projects', task.projectId]">
+            <strong>{{ task.title }}</strong>
+            <span>{{ task.projectName }} · {{ task.due }} · {{ task.assignee || 'Unassigned' }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+
   <a routerLink="/projects">View projects →</a>
   <button type="button" class="reset" (click)="reset()">Reset demo data</button>
 </section>

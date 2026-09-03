@@ -17,6 +17,10 @@ export class Dashboard {
     return this.board.counts();
   }
 
+  get overdue() {
+    return this.board.overdueList();
+  }
+
   reset() {
     if (!confirm('Reset to the original demo projects and tasks?')) {
       return;

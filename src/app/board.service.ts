@@ -19,6 +19,7 @@ const SEED_TASKS: Task[] = [
     priority: 'medium',
     notes: 'Hero, nav, and footer.',
     due: '2026-08-20',
+    assignee: 'Salhe',
   },
   {
     id: 't2',
@@ -28,6 +29,7 @@ const SEED_TASKS: Task[] = [
     priority: 'high',
     notes: 'Validate email before submit.',
     due: '2026-09-05',
+    assignee: 'Maya',
   },
   {
     id: 't3',
@@ -37,6 +39,7 @@ const SEED_TASKS: Task[] = [
     priority: 'low',
     notes: '',
     due: '2026-09-12',
+    assignee: '',
   },
   {
     id: 't4',
@@ -46,6 +49,7 @@ const SEED_TASKS: Task[] = [
     priority: 'high',
     notes: 'Biometric later.',
     due: '2026-09-04',
+    assignee: 'Salhe',
   },
   {
     id: 't5',
@@ -55,6 +59,7 @@ const SEED_TASKS: Task[] = [
     priority: 'medium',
     notes: '',
     due: '',
+    assignee: 'Alex',
   },
   {
     id: 't6',
@@ -64,6 +69,7 @@ const SEED_TASKS: Task[] = [
     priority: 'high',
     notes: 'JWT refresh flow.',
     due: '2026-09-01',
+    assignee: 'Maya',
   },
   {
     id: 't7',
@@ -73,6 +79,7 @@ const SEED_TASKS: Task[] = [
     priority: 'low',
     notes: '',
     due: '2026-09-20',
+    assignee: 'Alex',
   },
 ];
 
@@ -144,7 +151,12 @@ export class BoardService {
     this.save();
   }
 
-  addTask(projectId: string, title: string, priority: TaskPriority = 'medium') {
+  addTask(
+    projectId: string,
+    title: string,
+    priority: TaskPriority = 'medium',
+    assignee = '',
+  ) {
     const trimmed = title.trim();
     if (!trimmed) {
       return;
@@ -158,13 +170,14 @@ export class BoardService {
       priority,
       notes: '',
       due: '',
+      assignee,
     });
     this.save();
   }
 
   updateTask(
     taskId: string,
-    fields: { title: string; priority: TaskPriority; notes: string; due: string },
+    fields: { title: string; priority: TaskPriority; notes: string; due: string; assignee: string },
   ) {
     const task = this.tasks.find((item) => item.id === taskId);
     const trimmed = fields.title.trim();
@@ -176,6 +189,7 @@ export class BoardService {
     task.priority = fields.priority;
     task.notes = fields.notes.trim();
     task.due = fields.due;
+    task.assignee = fields.assignee;
     this.save();
   }
 
@@ -205,6 +219,30 @@ export class BoardService {
       this.tasks.splice(index, 1);
       this.save();
     }
+  }
+
+  duplicateTask(taskId: string) {
+    const task = this.tasks.find((item) => item.id === taskId);
+    if (!task) {
+      return;
+    }
+
+    this.tasks.push({
+      ...task,
+      id: `t${Date.now()}`,
+      title: `${task.title} (copy)`,
+      status: 'open',
+    });
+    this.save();
+  }
+
+  overdueList() {
+    return this.tasks
+      .filter((task) => this.isOverdue(task))
+      .map((task) => ({
+        ...task,
+        projectName: this.projectById(task.projectId)?.name ?? 'Unknown',
+      }));
   }
 
   isOverdue(task: Task): boolean {
@@ -262,6 +300,7 @@ export class BoardService {
       priority,
       notes: task.notes ?? '',
       due: task.due ?? '',
+      assignee: task.assignee ?? '',
     };
   }
 

@@ -15,6 +15,8 @@ export const TASK_PRIORITIES: { id: TaskPriority; label: string }[] = [
   { id: 'high', label: 'High' },
 ];
 
+export const PEOPLE = ['Salhe', 'Maya', 'Alex'];
+
 export interface Project {
   id: string;
   name: string;
@@ -29,4 +31,5 @@ export interface Task {
   priority: TaskPriority;
   notes: string;
   due: string;
+  assignee: string;
 }
