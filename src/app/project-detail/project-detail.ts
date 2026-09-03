@@ -43,6 +43,9 @@ export class ProjectDetail {
   editNotes = '';
   editDue = '';
   editAssignee = '';
+  hideDone = false;
+  checkDraft: Record<string, string> = {};
+  projects: Project[] = [];
   editingProject = false;
   projectName = '';
   projectDescription = '';
@@ -129,6 +132,50 @@ export class ProjectDetail {
     this.reload();
   }
 
+  move(taskId: string, projectId: string) {
+    if (!projectId || projectId === this.project?.id) {
+      return;
+    }
+    this.board.moveTask(taskId, projectId);
+    this.reload();
+  }
+
+  toggleItem(taskId: string, itemId: string) {
+    this.board.toggleCheck(taskId, itemId);
+    this.reload();
+  }
+
+  addItem(taskId: string) {
+    this.board.addCheck(taskId, this.checkDraft[taskId] ?? '');
+    this.checkDraft[taskId] = '';
+    this.reload();
+  }
+
+  removeItem(taskId: string, itemId: string) {
+    this.board.removeCheck(taskId, itemId);
+    this.reload();
+  }
+
+  star() {
+    if (!this.project) {
+      return;
+    }
+    this.board.toggleStar(this.project.id);
+    this.reload();
+  }
+
+  doneCount(task: Task): number {
+    return (task.checklist ?? []).filter((item) => item.done).length;
+  }
+
+  otherProjects() {
+    return this.projects.filter((item) => item.id !== this.project?.id);
+  }
+
+  visibleSteps() {
+    return this.hideDone ? this.steps.filter((step) => step.id !== 'done') : this.steps;
+  }
+
   overdue(task: Task): boolean {
     return this.board.isOverdue(task);
   }
@@ -160,11 +207,18 @@ export class ProjectDetail {
     return list;
   }
 
-  dragStart(taskId: string) {
-    if (this.editingId === taskId) {
+  dragStart(event: DragEvent, taskId: string) {
+    if (this.editingId === taskId || (event.target as HTMLElement).closest('.nodrag')) {
+      event.preventDefault();
       return;
     }
     this.draggingId = taskId;
+  }
+
+  moveFromSelect(taskId: string, event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.move(taskId, select.value);
+    select.value = '';
   }
 
   dragOver(event: DragEvent, status: TaskStatus) {
@@ -186,10 +240,10 @@ export class ProjectDetail {
   }
 
   private reload() {
-    if (!this.project) {
-      this.tasks = [];
-      return;
+    this.projects = this.board.allProjects();
+    if (this.project) {
+      this.project = this.board.projectById(this.project.id);
     }
-    this.tasks = this.board.tasksFor(this.project.id);
+    this.tasks = this.project ? this.board.tasksFor(this.project.id) : [];
   }
 }

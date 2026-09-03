@@ -21,6 +21,15 @@ h1 {
   gap: 1rem;
 }
 
+.heading-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.star-mark {
+  color: #ca8a04;
+}
+
 .project-edit {
   display: grid;
   gap: 0.5rem;
@@ -133,6 +142,10 @@ button {
   grid-template-columns: repeat(5, minmax(11rem, 1fr));
   gap: 0.75rem;
   overflow-x: auto;
+}
+
+.board.four {
+  grid-template-columns: repeat(4, minmax(11rem, 1fr));
 }
 
 .column {
@@ -323,8 +336,73 @@ article.late .due {
   gap: 0.35rem;
 }
 
+.checks {
+  list-style: none;
+  margin: 0 0 0.45rem;
+  padding: 0;
+}
+
+.checks li {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.2rem;
+}
+
+.checks label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.checks .struck {
+  text-decoration: line-through;
+  color: #64748b;
+}
+
+.checks-count {
+  margin: 0 0 0.35rem !important;
+  font-size: 0.72rem !important;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.check-add {
+  display: flex;
+  gap: 0.3rem;
+  max-width: none;
+  margin: 0 0 0.5rem;
+}
+
+.check-add input {
+  min-width: 0;
+  padding: 0.3rem 0.45rem;
+  font-size: 0.78rem;
+}
+
+.check-add button,
+.tiny {
+  padding: 0.2rem 0.45rem;
+  font-size: 0.72rem;
+}
+
+.move {
+  width: 100%;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.4rem;
+}
+
 @media (max-width: 800px) {
   .board {
     grid-template-columns: repeat(5, 14rem);
+  }
+
+  .board.four {
+    grid-template-columns: repeat(4, 14rem);
   }
 }

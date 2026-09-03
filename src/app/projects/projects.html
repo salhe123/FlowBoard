@@ -41,7 +41,12 @@
             </form>
           } @else {
             <a [routerLink]="['/projects', project.id]">
-              <h2>{{ project.name }}</h2>
+              <h2>
+                @if (project.starred) {
+                  <span class="star-mark" aria-hidden="true">★</span>
+                }
+                {{ project.name }}
+              </h2>
               <p>{{ project.description || 'No description' }}</p>
               <div class="pills">
                 @for (step of counts(project.id).steps; track step.id) {
@@ -50,6 +55,14 @@
               </div>
             </a>
             <div class="actions">
+              <button
+                type="button"
+                class="ghost star"
+                [class.on]="project.starred"
+                (click)="star(project)"
+              >
+                {{ project.starred ? '★' : '☆' }}
+              </button>
               <button type="button" (click)="startEdit(project)">Edit</button>
               <button type="button" class="danger" (click)="remove(project)">Delete</button>
             </div>

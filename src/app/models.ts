@@ -21,6 +21,13 @@ export interface Project {
   id: string;
   name: string;
   description: string;
+  starred: boolean;
+}
+
+export interface CheckItem {
+  id: string;
+  text: string;
+  done: boolean;
 }
 
 export interface Task {
@@ -32,4 +39,5 @@ export interface Task {
   notes: string;
   due: string;
   assignee: string;
+  checklist: CheckItem[];
 }

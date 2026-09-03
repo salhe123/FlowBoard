@@ -19,10 +19,20 @@
     } @else {
       <div class="heading">
         <div>
-          <h1>{{ project.name }}</h1>
+          <h1>
+            @if (project.starred) {
+              <span class="star-mark" aria-hidden="true">★</span>
+            }
+            {{ project.name }}
+          </h1>
           <p class="lead">{{ project.description || 'No description' }}</p>
         </div>
-        <button type="button" (click)="startEditProject()">Edit</button>
+        <div class="heading-actions">
+          <button type="button" class="ghost" (click)="star()">
+            {{ project.starred ? 'Unstar' : 'Star' }}
+          </button>
+          <button type="button" (click)="startEditProject()">Edit</button>
+        </div>
       </div>
     }
 
@@ -81,10 +91,11 @@
         <option value="priority">Sort: priority</option>
         <option value="due">Sort: due date</option>
       </select>
+      <button type="button" [class.on]="hideDone" (click)="hideDone = !hideDone">Hide Done</button>
     </div>
 
-    <div class="board">
-      @for (step of steps; track step.id) {
+    <div class="board" [class.four]="hideDone">
+      @for (step of visibleSteps(); track step.id) {
         <section
           class="column"
           [attr.data-step]="step.id"
@@ -103,7 +114,7 @@
               [attr.data-priority]="task.priority"
               [class.dragging]="draggingId === task.id"
               [class.late]="overdue(task)"
-              (dragstart)="dragStart(task.id)"
+              (dragstart)="dragStart($event, task.id)"
             >
               @if (editingId === task.id) {
                 <form class="edit" (submit)="saveEdit(); $event.preventDefault()">
@@ -145,12 +156,53 @@
                 @if (task.notes) {
                   <p class="notes">{{ task.notes }}</p>
                 }
+                @if (task.checklist.length) {
+                  <p class="checks-count">{{ doneCount(task) }}/{{ task.checklist.length }} done</p>
+                }
+                <ul class="checks nodrag">
+                  @for (item of task.checklist; track item.id) {
+                    <li>
+                      <label>
+                        <input
+                          type="checkbox"
+                          [checked]="item.done"
+                          (change)="toggleItem(task.id, item.id)"
+                        />
+                        <span [class.struck]="item.done">{{ item.text }}</span>
+                      </label>
+                      <button type="button" class="ghost tiny" (click)="removeItem(task.id, item.id)">
+                        ×
+                      </button>
+                    </li>
+                  }
+                </ul>
+                <form class="check-add nodrag" (submit)="addItem(task.id); $event.preventDefault()">
+                  <input
+                    [(ngModel)]="checkDraft[task.id]"
+                    [name]="'check-' + task.id"
+                    type="text"
+                    placeholder="Checklist item"
+                  />
+                  <button type="submit">Add</button>
+                </form>
                 <div class="actions">
                   <button type="button" (click)="startEdit(task)">Edit</button>
                   <button type="button" class="ghost" (click)="copy(task.id)">Copy</button>
                   <button type="button" (click)="cycle(task.id)">Next step</button>
                   <button type="button" class="danger" (click)="remove(task.id)">Delete</button>
                 </div>
+                @if (otherProjects().length) {
+                  <select
+                    class="move nodrag"
+                    (change)="moveFromSelect(task.id, $event)"
+                    [attr.aria-label]="'Move ' + task.title"
+                  >
+                    <option value="">Move to…</option>
+                    @for (item of otherProjects(); track item.id) {
+                      <option [value]="item.id">{{ item.name }}</option>
+                    }
+                  </select>
+                }
               }
             </article>
           }

@@ -107,6 +107,19 @@ h2 {
   font-size: 1.05rem;
 }
 
+.star-mark {
+  color: #ca8a04;
+}
+
+.star {
+  min-width: 2.1rem;
+}
+
+.star.on {
+  background: #fef9c3;
+  color: #ca8a04;
+}
+
 p {
   margin: 0;
   color: #64748b;

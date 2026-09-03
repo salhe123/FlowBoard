@@ -5,9 +5,9 @@ const USER_KEY = 'flowboard-user';
 const DATA_KEY = 'flowboard-data';
 
 const SEED_PROJECTS: Project[] = [
-  { id: 'p1', name: 'Website', description: 'Marketing site refresh' },
-  { id: 'p2', name: 'Mobile app', description: 'iOS / Android client' },
-  { id: 'p3', name: 'API', description: 'Public REST API' },
+  { id: 'p1', name: 'Website', description: 'Marketing site refresh', starred: true },
+  { id: 'p2', name: 'Mobile app', description: 'iOS / Android client', starred: false },
+  { id: 'p3', name: 'API', description: 'Public REST API', starred: false },
 ];
 
 const SEED_TASKS: Task[] = [
@@ -20,6 +20,7 @@ const SEED_TASKS: Task[] = [
     notes: 'Hero, nav, and footer.',
     due: '2026-08-20',
     assignee: 'Salhe',
+    checklist: [],
   },
   {
     id: 't2',
@@ -30,6 +31,10 @@ const SEED_TASKS: Task[] = [
     notes: 'Validate email before submit.',
     due: '2026-09-05',
     assignee: 'Maya',
+    checklist: [
+      { id: 'c1', text: 'Name and email fields', done: true },
+      { id: 'c2', text: 'Send to API', done: false },
+    ],
   },
   {
     id: 't3',
@@ -40,6 +45,7 @@ const SEED_TASKS: Task[] = [
     notes: '',
     due: '2026-09-12',
     assignee: '',
+    checklist: [],
   },
   {
     id: 't4',
@@ -50,6 +56,7 @@ const SEED_TASKS: Task[] = [
     notes: 'Biometric later.',
     due: '2026-09-04',
     assignee: 'Salhe',
+    checklist: [{ id: 'c3', text: 'Password reset link', done: false }],
   },
   {
     id: 't5',
@@ -60,6 +67,7 @@ const SEED_TASKS: Task[] = [
     notes: '',
     due: '',
     assignee: 'Alex',
+    checklist: [],
   },
   {
     id: 't6',
@@ -70,6 +78,7 @@ const SEED_TASKS: Task[] = [
     notes: 'JWT refresh flow.',
     due: '2026-09-01',
     assignee: 'Maya',
+    checklist: [],
   },
   {
     id: 't7',
@@ -80,6 +89,7 @@ const SEED_TASKS: Task[] = [
     notes: '',
     due: '2026-09-20',
     assignee: 'Alex',
+    checklist: [],
   },
 ];
 
@@ -131,6 +141,7 @@ export class BoardService {
       id: `p${Date.now()}`,
       name: trimmed,
       description: description.trim(),
+      starred: false,
     });
     this.save();
   }
@@ -141,6 +152,14 @@ export class BoardService {
     if (project && trimmed) {
       project.name = trimmed;
       project.description = description.trim();
+      this.save();
+    }
+  }
+
+  toggleStar(projectId: string) {
+    const project = this.projects.find((item) => item.id === projectId);
+    if (project) {
+      project.starred = !project.starred;
       this.save();
     }
   }
@@ -171,6 +190,7 @@ export class BoardService {
       notes: '',
       due: '',
       assignee,
+      checklist: [],
     });
     this.save();
   }
@@ -232,7 +252,45 @@ export class BoardService {
       id: `t${Date.now()}`,
       title: `${task.title} (copy)`,
       status: 'open',
+      checklist: task.checklist?.map((item) => ({ ...item, id: `c${Date.now()}-${item.id}` })) ?? [],
     });
+    this.save();
+  }
+
+  moveTask(taskId: string, projectId: string) {
+    const task = this.tasks.find((item) => item.id === taskId);
+    if (task && this.projectById(projectId)) {
+      task.projectId = projectId;
+      task.status = 'open';
+      this.save();
+    }
+  }
+
+  addCheck(taskId: string, text: string) {
+    const trimmed = text.trim();
+    const task = this.tasks.find((item) => item.id === taskId);
+    if (!task || !trimmed) {
+      return;
+    }
+    task.checklist ??= [];
+    task.checklist.push({ id: `c${Date.now()}`, text: trimmed, done: false });
+    this.save();
+  }
+
+  toggleCheck(taskId: string, itemId: string) {
+    const item = this.tasks.find((task) => task.id === taskId)?.checklist.find((row) => row.id === itemId);
+    if (item) {
+      item.done = !item.done;
+      this.save();
+    }
+  }
+
+  removeCheck(taskId: string, itemId: string) {
+    const task = this.tasks.find((item) => item.id === taskId);
+    if (!task) {
+      return;
+    }
+    task.checklist = task.checklist.filter((row) => row.id !== itemId);
     this.save();
   }
 
@@ -290,6 +348,15 @@ export class BoardService {
     return new Date().toISOString().slice(0, 10);
   }
 
+  private normalizeProject(project: Partial<Project> & Pick<Project, 'id' | 'name'>): Project {
+    return {
+      id: project.id,
+      name: project.name,
+      description: project.description ?? '',
+      starred: !!project.starred,
+    };
+  }
+
   private normalize(task: Partial<Task> & Pick<Task, 'id' | 'projectId' | 'title' | 'status'>): Task {
     const priority = task.priority === 'low' || task.priority === 'high' ? task.priority : 'medium';
     return {
@@ -301,6 +368,13 @@ export class BoardService {
       notes: task.notes ?? '',
       due: task.due ?? '',
       assignee: task.assignee ?? '',
+      checklist: Array.isArray(task.checklist)
+        ? task.checklist.map((item) => ({
+            id: item.id,
+            text: item.text,
+            done: !!item.done,
+          }))
+        : [],
     };
   }
 
@@ -317,7 +391,7 @@ export class BoardService {
       }
 
       return {
-        projects: parsed.projects,
+        projects: parsed.projects.map((project) => this.normalizeProject(project)),
         tasks: parsed.tasks.map((task) => this.normalize(task)),
       };
     } catch {
@@ -335,7 +409,10 @@ export class BoardService {
   private seed(): { projects: Project[]; tasks: Task[] } {
     return {
       projects: SEED_PROJECTS.map((project) => ({ ...project })),
-      tasks: SEED_TASKS.map((task) => ({ ...task })),
+      tasks: SEED_TASKS.map((task) => ({
+        ...task,
+        checklist: task.checklist.map((item) => ({ ...item })),
+      })),
     };
   }
 }

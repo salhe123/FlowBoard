@@ -56,14 +56,21 @@ export class Projects {
     this.reload();
   }
 
+  star(project: Project) {
+    this.board.toggleStar(project.id);
+    this.reload();
+  }
+
   visible(): Project[] {
     const q = this.query.trim().toLowerCase();
-    return this.projects.filter(
-      (project) =>
-        !q ||
-        project.name.toLowerCase().includes(q) ||
-        project.description.toLowerCase().includes(q),
-    );
+    return this.projects
+      .filter(
+        (project) =>
+          !q ||
+          project.name.toLowerCase().includes(q) ||
+          project.description.toLowerCase().includes(q),
+      )
+      .sort((a, b) => Number(b.starred) - Number(a.starred));
   }
 
   counts(projectId: string) {
