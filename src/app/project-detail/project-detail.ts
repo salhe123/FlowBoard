@@ -2,7 +2,14 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BoardService } from '../board.service';
-import { Project, Task, TASK_STEPS, TaskStatus } from '../models';
+import {
+  Project,
+  Task,
+  TASK_PRIORITIES,
+  TASK_STEPS,
+  TaskPriority,
+  TaskStatus,
+} from '../models';
 
 @Component({
   selector: 'app-project-detail',
@@ -18,11 +25,17 @@ export class ProjectDetail {
   tasks: Task[] = [];
   title = '';
   query = '';
+  newPriority: TaskPriority = 'medium';
+  priorityFilter: TaskPriority | 'all' = 'all';
   steps = TASK_STEPS;
+  priorities = TASK_PRIORITIES;
   draggingId = '';
   overStatus: TaskStatus | '' = '';
   editingId = '';
   editTitle = '';
+  editPriority: TaskPriority = 'medium';
+  editNotes = '';
+  editDue = '';
   editingProject = false;
   projectName = '';
   projectDescription = '';
@@ -37,8 +50,9 @@ export class ProjectDetail {
     if (!this.project) {
       return;
     }
-    this.board.addTask(this.project.id, this.title);
+    this.board.addTask(this.project.id, this.title, this.newPriority);
     this.title = '';
+    this.newPriority = 'medium';
     this.reload();
   }
 
@@ -67,18 +81,24 @@ export class ProjectDetail {
   startEdit(task: Task) {
     this.editingId = task.id;
     this.editTitle = task.title;
+    this.editPriority = task.priority;
+    this.editNotes = task.notes;
+    this.editDue = task.due;
   }
 
   saveEdit() {
-    this.board.renameTask(this.editingId, this.editTitle);
+    this.board.updateTask(this.editingId, {
+      title: this.editTitle,
+      priority: this.editPriority,
+      notes: this.editNotes,
+      due: this.editDue,
+    });
     this.editingId = '';
-    this.editTitle = '';
     this.reload();
   }
 
   cancelEdit() {
     this.editingId = '';
-    this.editTitle = '';
   }
 
   cycle(taskId: string) {
@@ -91,10 +111,19 @@ export class ProjectDetail {
     this.reload();
   }
 
+  overdue(task: Task): boolean {
+    return this.board.isOverdue(task);
+  }
+
   tasksIn(status: TaskStatus): Task[] {
     const q = this.query.trim().toLowerCase();
     return this.tasks.filter(
-      (task) => task.status === status && (!q || task.title.toLowerCase().includes(q)),
+      (task) =>
+        task.status === status &&
+        (this.priorityFilter === 'all' || task.priority === this.priorityFilter) &&
+        (!q ||
+          task.title.toLowerCase().includes(q) ||
+          task.notes.toLowerCase().includes(q)),
     );
   }
 

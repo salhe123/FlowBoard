@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Project, Task, TASK_STEPS, TaskStatus } from './models';
+import { Project, Task, TASK_STEPS, TaskPriority, TaskStatus } from './models';
 
 const USER_KEY = 'flowboard-user';
 const DATA_KEY = 'flowboard-data';
@@ -11,13 +11,69 @@ const SEED_PROJECTS: Project[] = [
 ];
 
 const SEED_TASKS: Task[] = [
-  { id: 't1', projectId: 'p1', title: 'Home page layout', status: 'done' },
-  { id: 't2', projectId: 'p1', title: 'Contact form', status: 'in-progress' },
-  { id: 't3', projectId: 'p1', title: 'SEO meta tags', status: 'todo' },
-  { id: 't4', projectId: 'p2', title: 'Login screen', status: 'in-progress' },
-  { id: 't5', projectId: 'p2', title: 'Push notifications', status: 'open' },
-  { id: 't6', projectId: 'p3', title: 'Auth endpoints', status: 'review' },
-  { id: 't7', projectId: 'p3', title: 'Rate limiting', status: 'todo' },
+  {
+    id: 't1',
+    projectId: 'p1',
+    title: 'Home page layout',
+    status: 'done',
+    priority: 'medium',
+    notes: 'Hero, nav, and footer.',
+    due: '2026-08-20',
+  },
+  {
+    id: 't2',
+    projectId: 'p1',
+    title: 'Contact form',
+    status: 'in-progress',
+    priority: 'high',
+    notes: 'Validate email before submit.',
+    due: '2026-09-05',
+  },
+  {
+    id: 't3',
+    projectId: 'p1',
+    title: 'SEO meta tags',
+    status: 'todo',
+    priority: 'low',
+    notes: '',
+    due: '2026-09-12',
+  },
+  {
+    id: 't4',
+    projectId: 'p2',
+    title: 'Login screen',
+    status: 'in-progress',
+    priority: 'high',
+    notes: 'Biometric later.',
+    due: '2026-09-04',
+  },
+  {
+    id: 't5',
+    projectId: 'p2',
+    title: 'Push notifications',
+    status: 'open',
+    priority: 'medium',
+    notes: '',
+    due: '',
+  },
+  {
+    id: 't6',
+    projectId: 'p3',
+    title: 'Auth endpoints',
+    status: 'review',
+    priority: 'high',
+    notes: 'JWT refresh flow.',
+    due: '2026-09-01',
+  },
+  {
+    id: 't7',
+    projectId: 'p3',
+    title: 'Rate limiting',
+    status: 'todo',
+    priority: 'low',
+    notes: '',
+    due: '2026-09-20',
+  },
 ];
 
 @Injectable({ providedIn: 'root' })
@@ -88,7 +144,7 @@ export class BoardService {
     this.save();
   }
 
-  addTask(projectId: string, title: string) {
+  addTask(projectId: string, title: string, priority: TaskPriority = 'medium') {
     const trimmed = title.trim();
     if (!trimmed) {
       return;
@@ -99,17 +155,28 @@ export class BoardService {
       projectId,
       title: trimmed,
       status: 'open',
+      priority,
+      notes: '',
+      due: '',
     });
     this.save();
   }
 
-  renameTask(taskId: string, title: string) {
-    const trimmed = title.trim();
+  updateTask(
+    taskId: string,
+    fields: { title: string; priority: TaskPriority; notes: string; due: string },
+  ) {
     const task = this.tasks.find((item) => item.id === taskId);
-    if (task && trimmed) {
-      task.title = trimmed;
-      this.save();
+    const trimmed = fields.title.trim();
+    if (!task || !trimmed) {
+      return;
     }
+
+    task.title = trimmed;
+    task.priority = fields.priority;
+    task.notes = fields.notes.trim();
+    task.due = fields.due;
+    this.save();
   }
 
   setStatus(taskId: string, status: TaskStatus) {
@@ -140,12 +207,21 @@ export class BoardService {
     }
   }
 
+  isOverdue(task: Task): boolean {
+    if (!task.due || task.status === 'done') {
+      return false;
+    }
+    return task.due < this.today();
+  }
+
   counts() {
     const tasks = this.tasks;
     return {
       projects: this.projects.length,
       tasks: tasks.length,
       done: tasks.filter((task) => task.status === 'done').length,
+      high: tasks.filter((task) => task.priority === 'high' && task.status !== 'done').length,
+      overdue: tasks.filter((task) => this.isOverdue(task)).length,
       steps: TASK_STEPS.map((step) => ({
         ...step,
         count: tasks.filter((task) => task.status === step.id).length,
@@ -172,6 +248,23 @@ export class BoardService {
     this.save();
   }
 
+  private today(): string {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  private normalize(task: Partial<Task> & Pick<Task, 'id' | 'projectId' | 'title' | 'status'>): Task {
+    const priority = task.priority === 'low' || task.priority === 'high' ? task.priority : 'medium';
+    return {
+      id: task.id,
+      projectId: task.projectId,
+      title: task.title,
+      status: task.status,
+      priority,
+      notes: task.notes ?? '',
+      due: task.due ?? '',
+    };
+  }
+
   private read(): { projects: Project[]; tasks: Task[] } {
     try {
       const raw = localStorage.getItem(DATA_KEY);
@@ -184,7 +277,10 @@ export class BoardService {
         return this.seed();
       }
 
-      return { projects: parsed.projects, tasks: parsed.tasks };
+      return {
+        projects: parsed.projects,
+        tasks: parsed.tasks.map((task) => this.normalize(task)),
+      };
     } catch {
       return this.seed();
     }

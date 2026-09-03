@@ -1,4 +1,5 @@
 export type TaskStatus = 'open' | 'todo' | 'in-progress' | 'review' | 'done';
+export type TaskPriority = 'low' | 'medium' | 'high';
 
 export const TASK_STEPS: { id: TaskStatus; label: string }[] = [
   { id: 'open', label: 'Open' },
@@ -6,6 +7,12 @@ export const TASK_STEPS: { id: TaskStatus; label: string }[] = [
   { id: 'in-progress', label: 'In Progress' },
   { id: 'review', label: 'Review' },
   { id: 'done', label: 'Done' },
+];
+
+export const TASK_PRIORITIES: { id: TaskPriority; label: string }[] = [
+  { id: 'low', label: 'Low' },
+  { id: 'medium', label: 'Medium' },
+  { id: 'high', label: 'High' },
 ];
 
 export interface Project {
@@ -19,4 +26,7 @@ export interface Task {
   projectId: string;
   title: string;
   status: TaskStatus;
+  priority: TaskPriority;
+  notes: string;
+  due: string;
 }

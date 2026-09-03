@@ -29,6 +29,11 @@
     <div class="toolbar">
       <form (submit)="add(); $event.preventDefault()">
         <input [(ngModel)]="title" name="title" type="text" placeholder="New task (starts as Open)" />
+        <select [(ngModel)]="newPriority" name="newPriority">
+          @for (level of priorities; track level.id) {
+            <option [value]="level.id">{{ level.label }}</option>
+          }
+        </select>
         <button type="submit">Add</button>
       </form>
       <input
@@ -39,6 +44,22 @@
         type="search"
         placeholder="Search tasks"
       />
+    </div>
+
+    <div class="filters">
+      <button type="button" [class.on]="priorityFilter === 'all'" (click)="priorityFilter = 'all'">
+        All
+      </button>
+      @for (level of priorities; track level.id) {
+        <button
+          type="button"
+          [attr.data-priority]="level.id"
+          [class.on]="priorityFilter === level.id"
+          (click)="priorityFilter = level.id"
+        >
+          {{ level.label }}
+        </button>
+      }
     </div>
 
     <div class="board">
@@ -58,17 +79,42 @@
           @for (task of tasksIn(step.id); track task.id) {
             <article
               [attr.draggable]="editingId !== task.id"
+              [attr.data-priority]="task.priority"
               [class.dragging]="draggingId === task.id"
+              [class.late]="overdue(task)"
               (dragstart)="dragStart(task.id)"
             >
               @if (editingId === task.id) {
                 <form class="edit" (submit)="saveEdit(); $event.preventDefault()">
                   <input [(ngModel)]="editTitle" name="editTitle" type="text" />
-                  <button type="submit">Save</button>
-                  <button type="button" class="ghost" (click)="cancelEdit()">Cancel</button>
+                  <select [(ngModel)]="editPriority" name="editPriority">
+                    @for (level of priorities; track level.id) {
+                      <option [value]="level.id">{{ level.label }}</option>
+                    }
+                  </select>
+                  <input [(ngModel)]="editDue" name="editDue" type="date" />
+                  <textarea
+                    [(ngModel)]="editNotes"
+                    name="editNotes"
+                    rows="2"
+                    placeholder="Notes"
+                  ></textarea>
+                  <div class="actions">
+                    <button type="submit">Save</button>
+                    <button type="button" class="ghost" (click)="cancelEdit()">Cancel</button>
+                  </div>
                 </form>
               } @else {
                 <p>{{ task.title }}</p>
+                <div class="meta">
+                  <span class="prio" [attr.data-priority]="task.priority">{{ task.priority }}</span>
+                  @if (task.due) {
+                    <span class="due" [class.late]="overdue(task)">{{ task.due }}</span>
+                  }
+                </div>
+                @if (task.notes) {
+                  <p class="notes">{{ task.notes }}</p>
+                }
                 <div class="actions">
                   <button type="button" (click)="startEdit(task)">Edit</button>
                   <button type="button" (click)="cycle(task.id)">Next step</button>
